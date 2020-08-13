@@ -5,9 +5,11 @@ package module
 
 import (
 	"bufio"
+	"context"
 	"errors"
-	"log"
 	"os"
+
+	"github.com/hashicorp/go-hclog"
 )
 
 // req contains all the metadata associated with a particular request.
@@ -51,18 +53,22 @@ func (r *req) getSecret() error {
 
 // Exec is the entrypoint to the module's code.  It is called directly
 // by main.
-func Exec() int {
+func Exec(l hclog.Logger, a Authenticator) int {
 	r, err := reqFromEnvironment()
 	if err != nil {
-		log.Println(err)
+		l.Debug("Error constructing request", "error", err)
 		return 1
 	}
 	if err := r.getSecret(); err != nil {
-		log.Println(err)
+		l.Debug("Error reading secret", "error", err)
 		return 2
 	}
 
-	log.Printf("%+v", r)
+	a.SetServiceName(r.service)
+	if err := a.AuthEntity(context.Background(), r.entity, r.secret); err != nil {
+		l.Debug("Authentication failed", "error", err)
+		return 1
+	}
 
 	return 0
 }
