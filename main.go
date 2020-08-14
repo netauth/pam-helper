@@ -26,9 +26,9 @@ func main() {
 	}
 
 	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.netauth/")
 	viper.AddConfigPath("/etc/netauth/")
+	viper.AddConfigPath("$HOME/.netauth/")
+	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
 		appLogger.Error("Error loading config", "error", err)
 		os.Exit(5)
