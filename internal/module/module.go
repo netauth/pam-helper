@@ -4,10 +4,11 @@
 package module
 
 import (
-	"bufio"
 	"context"
 	"errors"
+	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/hashicorp/go-hclog"
 )
@@ -40,13 +41,11 @@ func reqFromEnvironment() (*req, error) {
 }
 
 func (r *req) getSecret() error {
-	rdr := bufio.NewReader(os.Stdin)
-
-	b, _, err := rdr.ReadLine()
+	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		return err
 	}
-	r.secret = string(b[:])
+	r.secret = strings.TrimSuffix(string(b), string('\x00'))
 
 	return nil
 }
