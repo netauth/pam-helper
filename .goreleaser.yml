@@ -1,0 +1,27 @@
+before:
+  hooks:
+    - go mod vendor
+    - scripts/prepare.sh
+builds:
+  - goos:
+      - darwin
+      - freebsd
+      - linux
+archives:
+- replacements:
+    darwin: Darwin
+    linux: Linux
+    386: i386
+    amd64: x86_64
+  files:
+    - LICENSE
+    - NOTICE
+    - README.md
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+release:
+  github:
+    owner: netauth
+    name: pam-helper
